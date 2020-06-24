@@ -1,2 +1,2 @@
 # docker-octopus-tentacle
-Docker Tentacle Repo
+Docker repo for a generic linux tentacle worker in docker with development tools preinstalled.
