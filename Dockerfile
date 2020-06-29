@@ -1,10 +1,17 @@
 FROM mcr.microsoft.com/dotnet/core/aspnet:latest
 RUN apt update && \
-    apt install -y apt-transport-https curl jq gnupg perl python3-pip git && \
+    apt install -y apt-transport-https ca-certificates xz-utils curl jq gnupg perl python3-pip git && \
     curl -L https://git.io/n-install | bash -s -- -y && \
     curl -L https://github.com/mikefarah/yq/releases/download/3.3.0/yq_linux_amd64 -o /usr/local/bin/yq && \
     chmod +x /usr/local/bin/yq && \
     pip3 install octokitpy requests
+
+RUN export SFDX_DEBUG=1 \
+    && curl -sL https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz | tar xJ \
+    && ./sfdx*/install \
+    && rm -rf ./sfdx* \
+    && sfdx update   
+ENV SFDX_AUTOUPDATE_DISABLE=true SFDX_USE_GENERIC_UNIX_KEYCHAIN=true SFDX_DOMAIN_RETRY=300
 
 RUN curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.16.8/2020-04-16/bin/linux/amd64/aws-iam-authenticator && \
     chmod +x ./aws-iam-authenticator && \
