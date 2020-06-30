@@ -26,7 +26,7 @@ RUN curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/
     curl -sL "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -zx -C /usr/local/bin
     
 RUN apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc && \
-    echo "deb https://packages.microsoft.com/repos/microsoft-debian-stretch-prod stretch main" >> /etc/apt/sources.list && \
+    echo "deb https://packages.microsoft.com/repos/microsoft-debian-buster-prod buster main" >> /etc/apt/sources.list && \
     apt update && \
     apt install -y powershell
 
