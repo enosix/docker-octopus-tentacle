@@ -22,7 +22,7 @@ RUN curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/
     mv ./kubectl /usr/local/bin/kubectl && \
     curl -sL "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp && \
     mv /tmp/eksctl /usr/local/bin && \
-    curl -L https://k14s.io/install.sh | bash &&
+    curl -L https://k14s.io/install.sh | bash && \
     curl -sL "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -zx -C /usr/local/bin
     
 RUN apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc && \
