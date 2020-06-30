@@ -11,6 +11,7 @@ RUN export SFDX_DEBUG=1 \
     && ./sfdx*/install \
     && rm -rf ./sfdx* \
     && sfdx update   
+    
 ENV SFDX_AUTOUPDATE_DISABLE=true SFDX_USE_GENERIC_UNIX_KEYCHAIN=true SFDX_DOMAIN_RETRY=300
 
 RUN curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.16.8/2020-04-16/bin/linux/amd64/aws-iam-authenticator && \
@@ -21,12 +22,18 @@ RUN curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/
     mv ./kubectl /usr/local/bin/kubectl && \
     curl -sL "https://github.com/weaveworks/eksctl/releases/download/latest_release/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp && \
     mv /tmp/eksctl /usr/local/bin && \
-    curl -L https://k14s.io/install.sh | bash
+    curl -L https://k14s.io/install.sh | bash &&
+    curl -sL "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -zx -C /usr/local/bin
+    
+RUN apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc && \
+    echo "deb https://packages.microsoft.com/repos/microsoft-debian-stretch-prod stretch main" >> /etc/apt/sources.list && \
+    apt update && \
+    apt install -y powershell
 
 RUN apt-key adv --fetch-keys https://apt.octopus.com/public.key && \
     echo 'deb https://apt.octopus.com/ stretch main' >> /etc/apt/sources.list && \
     apt update && \
-    apt install tentacle
+    apt install -y tentacle
 
 WORKDIR /opt/octopus/tentacle/
 
