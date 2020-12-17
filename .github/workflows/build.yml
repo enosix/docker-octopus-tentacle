@@ -14,5 +14,5 @@ jobs:
             username: ${{ secrets.DOCKER_USERNAME }}
             password: ${{ secrets.DOCKER_PASSWORD }}
             repository: enosix/docker-octopus-tentacle/tentacle
-            registry: ghcr.io
+            registry: docker.pkg.github.com
             tag_with_ref: true
