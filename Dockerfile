@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:latest
+FROM mcr.microsoft.com/dotnet/sdk:3.1
 RUN apt update && \
     apt install -y apt-transport-https ca-certificates xz-utils curl jq gnupg perl python3-pip git && \
     curl -L https://git.io/n-install | bash -s -- -y && \
@@ -6,14 +6,16 @@ RUN apt update && \
     chmod +x /usr/local/bin/yq && \
     pip3 install octokitpy requests
 
-RUN export SFDX_DEBUG=1 \
-    && curl -sL https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz | tar xJ \
-    && ./sfdx*/install \
-    && rm -rf ./sfdx* \
-    && sfdx update   
+RUN apt install -y npm && \
+    npm install sfdx-cli@7.82.1-0 --global && \
+    sfdx --version
     
 ENV SFDX_AUTOUPDATE_DISABLE=true SFDX_USE_GENERIC_UNIX_KEYCHAIN=true SFDX_DOMAIN_RETRY=300
 
+# https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html#install-iam-authenticator-linux
+# https://kubernetes.io/docs/tasks/tools/install-kubectl/
+# https://carvel.dev/#whole-suite
+# https://docs.cloudfoundry.org/cf-cli/install-go-cli.html
 RUN curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.16.8/2020-04-16/bin/linux/amd64/aws-iam-authenticator && \
     chmod +x ./aws-iam-authenticator && \
     mv ./aws-iam-authenticator /usr/local/bin/aws-iam-authenticator && \
@@ -28,15 +30,19 @@ RUN curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/
 RUN apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc && \
     echo "deb https://packages.microsoft.com/repos/microsoft-debian-buster-prod buster main" >> /etc/apt/sources.list && \
     apt update && \
-    apt install -y powershell
+    apt install -y powershell && \
+    pwsh --version
 
+# https://octopus.com/downloads/tentacle#linux
 RUN apt-key adv --fetch-keys https://apt.octopus.com/public.key && \
     echo 'deb https://apt.octopus.com/ stretch main' >> /etc/apt/sources.list && \
     apt update && \
-    apt install -y tentacle
+    apt install -y tentacle && \
+    /opt/octopus/tentacle/Tentacle version
 
 WORKDIR /opt/octopus/tentacle/
 
+# https://octopus.com/docs/infrastructure/deployment-targets/linux/tentacle
 RUN ./Tentacle create-instance --config "/etc/octopus/default/tentacle-default.config" && \
     ./Tentacle new-certificate --if-blank && \
     ./Tentacle configure --noListen True --reset-trust --app "/home/Octopus/Applications/"
