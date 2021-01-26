@@ -1,0 +1,52 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: #@ data.values.name
+  name: #@ data.values.name
+  namespace: #@ data.values.namespace
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: #@ data.values.name
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: #@ data.values.name
+    spec:
+      containers:
+      - command: 
+        - sh
+        - -c
+        - ./Tentacle register-worker --server $serverUrl --apiKey $apiKey --workerPool $workerPool --force --comms-style TentacleActive && script -qefc './Tentacle agent' -
+        env:
+        - name: serverUrl
+          value: #@ data.values.serverUrl
+        - name: apiKey
+          value: #@ data.values.apiKey
+        - name: workerPool
+          value: #@ data.values.workerPool
+        image: #@ data.values.repo + ":" + #@ data.values.sha
+        imagePullPolicy: Always
+        name: #@ data.values.name
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      imagePullSecrets:
+      - name: github-tentacle
+      dnsPolicy: ClusterFirst
+      hostname: #@ "kube-" + data.values.name
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
