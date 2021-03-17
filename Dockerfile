@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/dotnet/sdk:3.1
 RUN apt update && \
-    apt install -y apt-transport-https ca-certificates xz-utils curl jq gnupg perl python3-pip git && \
+    apt install -y apt-transport-https ca-certificates xz-utils curl jq gnupg perl python3-pip git unzip && \
     curl -L https://git.io/n-install | bash -s -- -y && \
     curl -L https://github.com/mikefarah/yq/releases/download/3.3.0/yq_linux_amd64 -o /usr/local/bin/yq && \
     chmod +x /usr/local/bin/yq && \
@@ -11,6 +11,10 @@ RUN apt install -y npm && \
     sfdx --version
     
 ENV SFDX_AUTOUPDATE_DISABLE=true SFDX_USE_GENERIC_UNIX_KEYCHAIN=true SFDX_DOMAIN_RETRY=300
+
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install
 
 # https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html#install-iam-authenticator-linux
 # https://kubernetes.io/docs/tasks/tools/install-kubectl/
